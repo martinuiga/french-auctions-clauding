@@ -1,0 +1,18 @@
+services:
+  dashboard:
+    build: .
+    command: streamlit run app/dashboard.py --server.port=8501 --server.address=0.0.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    restart: unless-stopped
+
+  scraper:
+    build: .
+    command: python main.py
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - SCRAPE_HOUR=${SCRAPE_HOUR:-8}
+      - SCRAPE_MINUTE=${SCRAPE_MINUTE:-0}
+    restart: unless-stopped
