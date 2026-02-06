@@ -268,7 +268,7 @@ display_df = filtered_df[[
     'volume_allocated_mwh': 'Allocated (MWh)',
     'weighted_avg_price_eur': 'Price (EUR/MWh)'
 })
-st.dataframe(display_df, width='stretch', hide_index=True)
+st.dataframe(display_df, use_container_width=True, hide_index=True)
 
 st.markdown("---")
 st.caption("Data source: French Energy Auction Results Database")
