@@ -49,18 +49,18 @@ if AUTH_PASSWORD:
         config["cookie"]["expiry_days"]
     )
 
-    name, authentication_status, username = authenticator.login("Login", "main")
+    authenticator.login(location='main')
 
-    if authentication_status is False:
+    if st.session_state.get("authentication_status") is False:
         st.error("Username/password is incorrect")
         st.stop()
-    elif authentication_status is None:
+    elif st.session_state.get("authentication_status") is None:
         st.warning("Please enter your username and password")
         st.stop()
 
     # Show logout button in sidebar
-    authenticator.logout("Logout", "sidebar")
-    st.sidebar.write(f"Welcome, {name}")
+    authenticator.logout(location='sidebar')
+    st.sidebar.write(f"Welcome, {st.session_state.get('name')}")
 
 st.title("French Energy Auction Results")
 st.markdown("Interactive visualization of auction data by region and technology")
