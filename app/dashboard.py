@@ -1,9 +1,11 @@
 import sys
+import os
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import streamlit as st
+import streamlit_authenticator as stauth
 import pandas as pd
 import plotly.express as px
 
@@ -15,6 +17,50 @@ st.set_page_config(
     page_icon="⚡",
     layout="wide"
 )
+
+# Authentication setup
+AUTH_USERNAME = os.environ.get("AUTH_USERNAME", "admin")
+AUTH_PASSWORD = os.environ.get("AUTH_PASSWORD")
+AUTH_NAME = os.environ.get("AUTH_NAME", "Admin User")
+
+if AUTH_PASSWORD:
+    hashed_password = stauth.Hasher([AUTH_PASSWORD]).generate()[0]
+
+    config = {
+        "credentials": {
+            "usernames": {
+                AUTH_USERNAME: {
+                    "name": AUTH_NAME,
+                    "password": hashed_password
+                }
+            }
+        },
+        "cookie": {
+            "name": "auction_dashboard_auth",
+            "key": os.environ.get("AUTH_COOKIE_KEY", "random_signature_key_123"),
+            "expiry_days": 30
+        }
+    }
+
+    authenticator = stauth.Authenticate(
+        config["credentials"],
+        config["cookie"]["name"],
+        config["cookie"]["key"],
+        config["cookie"]["expiry_days"]
+    )
+
+    name, authentication_status, username = authenticator.login("Login", "main")
+
+    if authentication_status is False:
+        st.error("Username/password is incorrect")
+        st.stop()
+    elif authentication_status is None:
+        st.warning("Please enter your username and password")
+        st.stop()
+
+    # Show logout button in sidebar
+    authenticator.logout("Logout", "sidebar")
+    st.sidebar.write(f"Welcome, {name}")
 
 st.title("French Energy Auction Results")
 st.markdown("Interactive visualization of auction data by region and technology")
